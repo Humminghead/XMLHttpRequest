@@ -10,6 +10,7 @@
 
 namespace network {
 
+// https://xhr.spec.whatwg.org/
 class XMLHttpRequest {
 public:
   template <typename T = uint8_t> using ArrayBuffer = std::vector<T>;
