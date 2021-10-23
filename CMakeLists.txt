@@ -23,7 +23,7 @@ set(VERSION_PATCH "${CMAKE_MATCH_1}")
 set(LIB_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 message(STATUS "XMLHttpRequest: Version " ${LIB_VERSION})
 
-project(XMLHttpRequest VERSION ${LIB_VERSION} LANGUAGES CXX C)
+project(XMLHttpRequest VERSION ${LIB_VERSION} LANGUAGES CXX)
 
 #--------------------------------------------------------------------
 # Update module path
@@ -43,8 +43,11 @@ find_package(Boost 1.65 REQUIRED COMPONENTS regex thread)
 find_package(nghttp2 REQUIRED)
 
 file (GLOB SRC_FILES source/*)
-add_library(${PROJECT_NAME} STATIC ${SRC_FILES} )
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+add_library(${CMAKE_PROJECT_NAME} STATIC ${SRC_FILES} $<TARGET_OBJECTS:url-parser>)
+#add_dependencies(${CMAKE_PROJECT_NAME} url-parser)
+
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC
      -lboost_regex
@@ -53,7 +56,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC
      -lssl
      -pthread
      ${NGHTTP2_LIBRARIES}
-     $<TARGET_OBJECTS:url-parser>
      ) 
 
 #--------------------------------------------------------------------
@@ -80,7 +82,7 @@ install(TARGETS ${CMAKE_PROJECT_NAME}
 #--------------------------------------------------------------------
 # Tests
 #--------------------------------------------------------------------
-if(BUILD_TESTING)
+#if(BUILD_TESTING)
     enable_testing()
     add_subdirectory(${CMAKE_SOURCE_DIR}/tests)
-endif()
+#endif()
