@@ -82,7 +82,9 @@ install(TARGETS ${CMAKE_PROJECT_NAME}
 #--------------------------------------------------------------------
 # Tests
 #--------------------------------------------------------------------
-#if(BUILD_TESTING)
+if(BUILD_TESTING)
+    message( STATUS "\"BUILD_TESTING\" option is ON")
+
     enable_testing()
     add_subdirectory(${CMAKE_SOURCE_DIR}/tests)
-#endif()
+endif()
