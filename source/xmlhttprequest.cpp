@@ -31,6 +31,7 @@ XMLHttpRequest::XMLHttpRequest(std::string &&method, std::string &&url,
 
 void XMLHttpRequest::abort() {
   spdlog::trace("{} XMLHttpRequest::abort()", pthread_self());
+  d->service->stop();
   d->session->stop();
 }
 
