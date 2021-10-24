@@ -1,6 +1,6 @@
 #include <iostream>
 
-int main(){
-    std::cout <<"Hello from test!"<<std::endl;
-    return 0;
+int main() {
+  std::cout << "Status code: 200" << std::endl;
+  return 0;
 }

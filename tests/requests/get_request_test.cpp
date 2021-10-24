@@ -8,44 +8,41 @@
 int main() {
   using namespace network;
 
-  XMLHttpRequest rq( //
+  XMLHttpRequest req( //
       "GET", "https://mapgl.2gis.com/api/fonts/Noto_Sans_4.pbf", true);
 
-  rq.open();
+  req.open();
 
   // clang-format off
-      rq.setRequestHeader("accept", "*/*");
-      rq.setRequestHeader("accept-encoding", "gzip, deflate, br");
-      rq.setRequestHeader("accept-language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
-      rq.setRequestHeader("cache-control", "no-cache");
-      rq.setRequestHeader("dnt", "1");
-      rq.setRequestHeader("host", "mapgl.2gis.com");
-      rq.setRequestHeader("origin", "https://2gis.ru");
-      rq.setRequestHeader("pragma", "no-cache");
-      rq.setRequestHeader("referer", "https://2gis.ru/");
-      rq.setRequestHeader("user-agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:88.0) Gecko/20100101 Firefox/88.0");
+      req.setRequestHeader("accept", "*/*");
+      req.setRequestHeader("accept-encoding", "gzip, deflate, br");
+      req.setRequestHeader("accept-language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
+      req.setRequestHeader("cache-control", "no-cache");
+      req.setRequestHeader("dnt", "1");
+      req.setRequestHeader("host", "mapgl.2gis.com");
+      req.setRequestHeader("origin", "https://2gis.ru");
+      req.setRequestHeader("pragma", "no-cache");
+      req.setRequestHeader("referer", "https://2gis.ru/");
+      req.setRequestHeader("user-agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:88.0) Gecko/20100101 Firefox/88.0");
   // clang-format on
 
   // Send with callback
-  rq.send([](auto &&result) {
-    if (auto [rq, rp] = result; 200 == rp->statusCode()) {
+  req.send([&](auto &&result) {
+    if (auto [httpRq, httpRp] = result; 200 == httpRp->statusCode()) {
+      spdlog::info("{} Status code: {}", pthread_self(), httpRp->statusCode());
       spdlog::info("{} Host: {} Method: {} Scheme: {} Responce data size: {} ",
-                   pthread_self(), rq->host(), rq->method(), rq->scheme(),
-                   rp->contentLength());
+                   pthread_self(), httpRq->host(), httpRq->method(),
+                   httpRq->scheme(), httpRp->contentLength());
     } else {
-      spdlog::info("{} Code: {}", pthread_self(), rp->statusCode());
+      spdlog::info("{} Status code: {}", pthread_self(), httpRp->statusCode());
     }
+
+    // Print headers
+    spdlog::info("Raw responce headers:\r\n {} ", req.getAllResponseHeaders());
+
+    // Stop
+    req.abort();
   });
 
-  // Wait PING
-  std::this_thread::sleep_for(std::chrono::seconds(32));
-
-  // Stop
-  rq.abort();
-
-  // Print headers
-  spdlog::info("Raw responce headers:\r\n {} ", rq.getAllResponseHeaders());
-
-  std::cout << "Hello from test!" << std::endl;
   return 0;
 }
