@@ -32,6 +32,7 @@ public:
     start_send();
     start_receive();
   }
+  auto get_seq_num() const { return sequence_number_; }
 
 private:
   void start_send() {
@@ -142,7 +143,10 @@ int main(int argc, char *argv[]) {
 
     boost::asio::io_service io_service;
     pinger p(io_service, argv[1]);
-    io_service.run();
+    io_service.run_for(std::chrono::seconds(5));
+    p.get_seq_num() > 1 ? (std::cout << "Passed" << std::endl)
+                        : (std::cout << "Fail" << std::endl);
+    return 0;
   } catch (std::exception &e) {
     std::cerr << "Exception: " << e.what() << std::endl;
   }
