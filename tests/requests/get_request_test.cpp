@@ -7,11 +7,10 @@
 
 int main() {
   using namespace network;
+  spdlog::set_level(spdlog::level::trace); // Set global log level to debug
 
   XMLHttpRequest req( //
       "GET", "https://mapgl.2gis.com/api/fonts/Noto_Sans_4.pbf", true);
-
-  req.open();
 
   // clang-format off
       req.setRequestHeader("accept", "*/*");
@@ -25,6 +24,9 @@ int main() {
       req.setRequestHeader("referer", "https://2gis.ru/");
       req.setRequestHeader("user-agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:88.0) Gecko/20100101 Firefox/88.0");
   // clang-format on
+
+  req.open();
+  req.overrideMimeType("text/plain; charset=x-user-defined");
 
   // Send with callback
   req.send([&](auto &&result) {
