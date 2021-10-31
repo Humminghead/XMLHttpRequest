@@ -1,5 +1,7 @@
 #include "sessioncallbacks.h"
 
+#include <algorithm>
+#include <ctype.h>
 #include <spdlog/spdlog.h>
 
 #include "abstractsession.h"
@@ -85,6 +87,32 @@ int onHeaderCallback(nghttp2_session *session, const nghttp2_frame *frame,
         res->statusCode(session_utils::parse_uint(value, valuelen));
       } else if (token == http2::HD_CONTENT_LENGTH) {
         res->contentLength(session_utils::parse_uint(value, valuelen));
+      } else if (token == http2::HD_CONTENT_TYPE) {
+        // Set overriden mime type
+        if (auto &type = s->getMimeOverridenType(); !type.empty()) {
+          if (auto commaPos = type.find_first_of(';');
+              commaPos != std::string::npos && commaPos + 1 <= type.size()) {
+            auto [name, value] =
+                std::tuple{type.substr(0, commaPos),
+                           type.substr(commaPos + 1, type.size())};
+
+            // Clear all spaces
+            value.erase(std::remove_if(value.begin(), value.end(),
+                                       [](const auto c) { //
+                                         return std::isspace(c);
+                                       }),
+                        value.end());
+
+            spdlog::debug("{} Set overriden mime type: Token: {} Value: {}",
+                          pthread_self(), name, value);
+
+            res->header().emplace(
+                std::move(name),
+                HeaderValue{std::move(value),
+                            (flags & NGHTTP2_NV_FLAG_NO_INDEX) != 0});
+          }
+          break;
+        }
       }
 
       // Save header field
