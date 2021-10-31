@@ -16,6 +16,7 @@
 #include <boost/asio/deadline_timer.hpp>
 #include <nghttp2/nghttp2.h>
 #include <spdlog/spdlog.h>
+#include <string>
 
 namespace network {
 using DeadLineTimer = boost::asio::deadline_timer;
@@ -124,6 +125,8 @@ struct AbstractSession::Impl {
 
     return true;
   }
+
+  std::string overrideMimeType_{};
 };
 
 AbstractSession::AbstractSession(
@@ -540,6 +543,14 @@ void AbstractSession::startReadTimer() const {
 
   d->deadline.expires_from_now(d->read_timeout_);
   d->deadline.async_wait(onWait);
+}
+
+void AbstractSession::setMimeOverridenType(std::string &&mime) {
+  d->overrideMimeType_ = std::move(mime);
+}
+
+const std::string &AbstractSession::getMimeOverridenType() const {
+  return d->overrideMimeType_;
 }
 
 int AbstractSession::submitPing(const boost::system::error_code &ec) const {

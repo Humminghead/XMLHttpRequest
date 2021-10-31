@@ -127,7 +127,9 @@ void XMLHttpRequest::open(std::string method,     //
   // clang-format on
 }
 
-void XMLHttpRequest::overrideMimeType(std::string mime) {}
+void XMLHttpRequest::overrideMimeType(std::string &&mime) {
+  d->session->setMimeOverridenType(std::move(mime));
+}
 
 void XMLHttpRequest::send() {
   if (auto method = HttpTlsSession::methodFromString(d->method);

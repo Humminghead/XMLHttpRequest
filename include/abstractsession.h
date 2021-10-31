@@ -115,6 +115,9 @@ public:
   void startWaitConnectionTimer() const;
   void startReadTimer() const;
 
+  void setMimeOverridenType(std::string &&mime);
+  const std::string &getMimeOverridenType() const;
+
 protected:
   int submitPing(const boost::system::error_code &ec) const;
   int submitPing() const;

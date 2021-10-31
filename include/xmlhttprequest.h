@@ -27,7 +27,7 @@ public:
   void open(std::string &&method, std::string &&url, bool async);
   void open(std::string method, std::string uri, bool async,
             const std::string user, const std::string password);
-  void overrideMimeType(std::string mime);
+  void overrideMimeType(std::string &&mime);
   void send();
   void send(onReadyCallback &&);
   void send(ArrayBuffer<> &&array);
