@@ -100,8 +100,8 @@ bool XMLHttpRequest::Impl::setupSession() noexcept {
   this->contextSsl = std::make_shared<boost::asio::ssl::context>(
       boost::asio::ssl::context::tlsv13_client);
 
-  if (utils::ssl::loadCertificate(defaults::certificate->data(), *contextSsl,
-                                  ec)
+  if (!ssl_certificate.empty() &&
+      utils::ssl::loadCertificate(ssl_certificate.data(), *contextSsl, ec)
           .failed()) {
     spdlog::error("{} {}", pthread_self(), "Certificate load failed! ");
     return false;
@@ -137,6 +137,23 @@ bool XMLHttpRequest::Impl::setupSession() noexcept {
     return true;
 
   return false;
+}
+
+const std::string &XMLHttpRequest::Impl::certificate_ssl() const noexcept {
+  return ssl_certificate;
+}
+
+void XMLHttpRequest::Impl::certificate_ssl(std::string &&cert) noexcept {
+  ssl_certificate = std::move(cert);
+}
+
+void XMLHttpRequest::Impl::certificate_ssl(const std::string &cert) noexcept {
+  ssl_certificate = cert;
+}
+
+void XMLHttpRequest::Impl::certificate_ssl(
+    const std::string_view &cert) noexcept {
+  ssl_certificate = cert;
 }
 
 std::tuple<bool, XMLHttpRequest::Impl::Elements>
