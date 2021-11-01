@@ -1,9 +1,9 @@
 #ifndef DEFAULTS_H
 #define DEFAULTS_H
 
-#include "certificate.h"
-// clang-format off
+#include <string_view>
 
+// clang-format off
 namespace network::defaults {
 ///\brief Default 2Gis server port
 [[maybe_unused]] static constexpr std::string_view default_server_port{"443"};
