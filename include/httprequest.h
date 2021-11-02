@@ -17,6 +17,9 @@ private:
 public:
   Request();
 
+  Request(const Request &) = delete;
+  Request &operator=(const Request &) = delete;
+
   void scheme(const char *value, size_t len) noexcept;
   void host(const char *value, size_t len) noexcept;
   void method(const char *value, size_t len) noexcept;
@@ -29,8 +32,6 @@ public:
 
   Header &header();
   void header(std::string name, HeaderValue &&value) noexcept;
-
-  //  void onClose(uint32_t errorCode);
 };
 
-} // namespace::network
+} // namespace network

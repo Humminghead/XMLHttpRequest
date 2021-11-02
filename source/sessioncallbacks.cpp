@@ -6,6 +6,7 @@
 
 #include "abstractsession.h"
 #include "http2.h"
+#include "httpheader.h"
 #include "httpheadervalue.h"
 #include "httprequest.h"
 #include "httpresponce.h"
