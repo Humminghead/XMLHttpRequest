@@ -18,25 +18,23 @@ public:
 
   Responce();
 
-  void onData(const uint8_t *data, size_t len);
-
   Responce(const Responce &) = delete;
   Responce &operator=(const Responce &) = delete;
 
-  void statusCode(int sc);
+  void statusCode(const int sc);
   int statusCode() const;
 
-  void contentLength(int64_t n);
+  void contentLength(const int64_t n);
   int64_t contentLength() const;
-  void contentLengthInc(int64_t n);
 
-  virtual Header &header();
-  virtual const Header &header() const;
+  Header &header();
+  const Header &header() const;
 
   size_t headerBufferSize() const;
-  void updateHeaderBufferSize(size_t len);
+  void updateHeaderBufferSize(const size_t len);
 
   const data_type &data() const;
+  void data(const uint8_t *data, const size_t len);
 };
 
 } // namespace network

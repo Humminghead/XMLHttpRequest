@@ -5,8 +5,6 @@
 #include "httpheadervalue.h"
 #include "httprequest.h"
 #include "httpresponce.h"
-#include "interlock.h"
-#include "literals.h"
 #include "sessioncallbacks.h"
 #include "sessionstream.h"
 #include "sessionutil.h"
@@ -14,6 +12,8 @@
 
 #include <array>
 #include <boost/asio/deadline_timer.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <nghttp2/nghttp2.h>
 #include <spdlog/spdlog.h>
 #include <string>
@@ -21,9 +21,6 @@
 namespace network {
 using DeadLineTimer = boost::asio::deadline_timer;
 using PosixTimeDuration = boost::posix_time::time_duration;
-
-// When session streams empty ping session every this time
-static const auto PING_TIME = boost::posix_time::seconds(30);
 
 using namespace network::literals;
 
@@ -47,7 +44,7 @@ struct AbstractSession::Impl {
         resolver_(service) {}
 
   boost::asio::io_service &service;
-  boost::system::error_code ec;
+  ErrorCode ec;
 
   std::mutex nghttp2_session_mutex_;
   nghttp2_session *session{nullptr};
@@ -81,7 +78,7 @@ struct AbstractSession::Impl {
 
   Streams streams;
 
-  Interlock insideCb;
+  std::mutex insideCb;
 
   const uint8_t *data_pending_{nullptr};
   size_t data_pendinglen_{0};
@@ -142,7 +139,7 @@ AbstractSession::~AbstractSession() { nghttp2_session_del(d->session); }
 
 void AbstractSession::startResolve(const std::string &host,
                                    const std::string &service,
-                                   boost::system::error_code &ec) noexcept {
+                                   ErrorCode &ec) noexcept {
 
   auto endpoint = d->resolver_.resolve(host, service, ec);
 
@@ -194,7 +191,7 @@ void AbstractSession::read() noexcept {
 
   auto self = shared_from_this();
 
-  auto readSocketPredicate = [self](const boost::system::error_code &ec,
+  auto readSocketPredicate = [self](const ErrorCode &ec,
                                     std::size_t bytes_transferred) {
     spdlog::trace("{} readSocketPredicate(ec, {})", pthread_self(),
                   bytes_transferred);
@@ -211,7 +208,7 @@ void AbstractSession::read() noexcept {
     }
 
     {
-      std::lock_guard<Interlock> lock(self->d->insideCb);
+      std::lock_guard<decltype(self->d->insideCb)> lock(self->d->insideCb);
       if (auto rv = nghttp2_session_mem_recv(
               self->d->session, self->d->rb_.data(), bytes_transferred);
           rv != static_cast<ssize_t>(bytes_transferred)) {
@@ -261,7 +258,7 @@ void AbstractSession::write() noexcept {
     d->data_pendinglen_ = 0;
   }
   {
-    std::lock_guard<Interlock> lock(d->insideCb);
+    std::lock_guard<decltype(d->insideCb)> lock(d->insideCb);
     for (ssize_t n = 0;;) {
       const uint8_t *data{nullptr};
 
@@ -307,7 +304,7 @@ void AbstractSession::write() noexcept {
 
   auto self = this->shared_from_this();
 
-  writeSocket([self](const boost::system::error_code &ec, std::size_t n) {
+  writeSocket([self](const ErrorCode &ec, std::size_t n) {
     spdlog::trace("{} writeSocket()", pthread_self());
     (void)n;
 
@@ -325,17 +322,13 @@ void AbstractSession::write() noexcept {
   });
 }
 
-bool AbstractSession::isStopped() const noexcept { //
-  return d->stopped;
-}
+bool AbstractSession::isStopped() const noexcept { return d->stopped; }
 
-void AbstractSession::setStopped(bool stopped) noexcept { //
+void AbstractSession::setStopped(bool stopped) noexcept {
   d->stopped = stopped;
 }
 
-boost::system::error_code &AbstractSession::getError() const { //
-  return d->ec;
-}
+AbstractSession::ErrorCode &AbstractSession::getError() const { return d->ec; }
 
 void AbstractSession::onSocketConnected(
     AbstractSession::EndpointIt endpoint_it) {
@@ -401,7 +394,7 @@ std::string NetworkErrorCategory::message(int ev) const {
   return "nghttp2 network error: " + std::to_string(ev);
 }
 
-std::tuple<boost::system::error_code, int32_t>
+std::tuple<AbstractSession::ErrorCode, int32_t>
 AbstractSession::submit(std::string_view url,    //
                         std::string_view method, //
                         const Header &header,    //
@@ -484,8 +477,10 @@ AbstractSession::submit(std::string_view url,    //
             assignedId};
   }
 
-  if (!d->insideCb.isLocked())
+  if (auto locked = d->insideCb.try_lock(); locked) {
     write();
+    d->insideCb.unlock();
+  }
 
   strm = std::make_shared<Stream>(
       assignedId, nghttp2_session_find_stream(d->session, assignedId));
@@ -493,14 +488,14 @@ AbstractSession::submit(std::string_view url,    //
   // addStream
   d->streams.try_emplace(assignedId, std::move(strm));
 
-  return {boost::system::error_code{}, assignedId};
+  return {ErrorCode{}, assignedId};
 }
 
 void AbstractSession::startPing() noexcept {
   spdlog::trace("{} AbstractSession::startPing()", pthread_self());
 
-  d->ping.expires_from_now(PING_TIME);
-  auto pinger = [this](const boost::system::error_code &ec) {
+  d->ping.expires_from_now(boost::posix_time::seconds(defaults::ping_time));
+  auto pinger = [this](const ErrorCode &ec) {
     submitPing(ec);
     write();
     startPing();
@@ -553,7 +548,7 @@ const std::string &AbstractSession::getMimeOverridenType() const {
   return d->overrideMimeType_;
 }
 
-int AbstractSession::submitPing(const boost::system::error_code &ec) const {
+int AbstractSession::submitPing(const ErrorCode &ec) const {
   if (isStopped() || ec == boost::asio::error::operation_aborted) {
     spdlog::trace("{} Ping aborted!", pthread_self());
     return 0;
@@ -562,7 +557,7 @@ int AbstractSession::submitPing(const boost::system::error_code &ec) const {
   return nghttp2_submit_ping(d->session, NGHTTP2_FLAG_NONE, nullptr);
 }
 int AbstractSession::submitPing() const {
-  boost::system::error_code ec;
+  ErrorCode ec;
   return submitPing(ec);
 }
 
@@ -581,7 +576,7 @@ void AbstractSession::goAway() noexcept {
   }
 }
 
-boost::system::error_code AbstractSession::goAway(uint32_t streamId) noexcept {
+AbstractSession::ErrorCode AbstractSession::goAway(uint32_t streamId) noexcept {
   if (auto it = d->streams.find(streamId); it != d->streams.end()) {
     auto ret = nghttp2_submit_goaway(d->session, NGHTTP2_FLAG_NONE, streamId,
                                      NGHTTP2_NO_ERROR, nullptr, 0);

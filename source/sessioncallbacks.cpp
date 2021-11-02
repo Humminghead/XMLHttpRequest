@@ -320,7 +320,7 @@ int onDataChunkRecvCallback(nghttp2_session *session, uint8_t flags,
   if (auto strm = s->findStream(stream_id); strm) {
     auto res = strm->response();
     spdlog::trace("{} Call res->onData(data,{}) ", pthread_self(), len);
-    res->onData(data, len);
+    res->data(data, len);
   } else {
     spdlog::trace("{} Stream {} not found ", pthread_self(), stream_id);
   }

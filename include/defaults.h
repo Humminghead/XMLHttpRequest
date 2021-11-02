@@ -5,10 +5,6 @@
 
 // clang-format off
 namespace network::defaults {
-///\brief Default 2Gis server port
-[[maybe_unused]] static constexpr std::string_view default_server_port{"443"};
-///\brief Default user agent for requests to server
-[[maybe_unused]] static constexpr std::string_view user_agent{R"(Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36)"};
 ///\brief Default log path
 [[maybe_unused]] static constexpr std::string_view network_log_path{R"(/var/log)"};
 ///\brief Http connect timeout(seconds)
@@ -22,6 +18,8 @@ namespace network::defaults {
 ///\brief Default SSL cipher list
 [[maybe_unused]] static constexpr std::string_view default_cipher_list{
     R"(TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_CCM_SHA256:TLS_AES_128_CCM_8_SHA256)"};
+///\brief When session streams empty ping http session every this time (in seconds)
+[[maybe_unused]] static constexpr auto ping_time = 30;
 } // namespace::network::defaults
 
 #endif // DEFAULTS_H

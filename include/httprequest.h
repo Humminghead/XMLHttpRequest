@@ -10,19 +10,15 @@ class HeaderValue;
 class Header;
 
 class Request {
-private:
-  struct Impl;
-  std::unique_ptr<Impl, void (*)(Impl *)> d;
-
 public:
   Request();
 
   Request(const Request &) = delete;
   Request &operator=(const Request &) = delete;
 
-  void scheme(const char *value, size_t len) noexcept;
-  void host(const char *value, size_t len) noexcept;
-  void method(const char *value, size_t len) noexcept;
+  void scheme(const char *value, const size_t len) noexcept;
+  void host(const char *value, const size_t len) noexcept;
+  void method(const char *value, const size_t len) noexcept;
 
   std::string scheme() const;
   std::string host() const;
@@ -32,6 +28,10 @@ public:
 
   Header &header();
   void header(std::string name, HeaderValue &&value) noexcept;
+
+private:
+  struct Impl;
+  std::unique_ptr<Impl, void (*)(Impl *)> d;
 };
 
 } // namespace network

@@ -1,11 +1,10 @@
 #pragma once
-#include <map>
+
 #include <string>
 
 namespace network {
 
 struct HeaderValue {
-  // Constructors
   HeaderValue() = default;
 
   HeaderValue(std::string &&val, bool sens = false)
@@ -14,7 +13,6 @@ struct HeaderValue {
   HeaderValue(const char *name, size_t size, bool sens = false)
       : value{name, size}, sensitive{sens} {}
 
-  // header field value
   std::string value{};
 
   // true if the header field value is sensitive information, such as
@@ -24,4 +22,4 @@ struct HeaderValue {
   bool sensitive{false};
 };
 
-} // namespace::network
+} // namespace network

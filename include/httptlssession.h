@@ -4,7 +4,6 @@
 #include "abstractsession.h"
 
 #include <boost/asio/ssl.hpp>
-#include <boost/system/error_code.hpp>
 
 namespace network {
 
@@ -18,8 +17,9 @@ public:
    * @param host
    * @param service
    */
-  HttpTlsSession(boost::asio::io_service &io_service,
-                 boost::asio::ssl::context &tlsCtx, const std::string &host,
+  HttpTlsSession(boost::asio::io_service &io_service, //
+                 boost::asio::ssl::context &tlsCtx,   //
+                 const std::string &host,             //
                  const std::string &service);
 
   /**
@@ -32,17 +32,19 @@ public:
    * @param exclusive
    * @return
    */
-  std::tuple<boost::system::error_code, int32_t>
+  std::tuple<AbstractSession::ErrorCode, int32_t>
   submit(std::string_view url, std::string_view method, Header &&header,
          int32_t &stream_id, int32_t &weight, const bool exclusive) noexcept;
+
   /**
    * @brief Submit request by selected url
    * @param Url for request
    * @param Request method
    * @return Error code and stream id
    */
-  std::tuple<boost::system::error_code, int32_t>
-  submit(Header &&headers, std::string_view url, Method method) noexcept;
+  std::tuple<AbstractSession::ErrorCode, int32_t>
+  submit(Header &&headers, std::string_view url,
+         AbstractSession::Method method) noexcept;
 
   /**
    * @brief Submit request by selected url
@@ -51,8 +53,8 @@ public:
    * @param User data
    * @return Error code and stream id
    */
-  std::tuple<boost::system::error_code, int32_t>
-  submit(Header &&headers, std::string_view url, Method method,
+  std::tuple<AbstractSession::ErrorCode, int32_t>
+  submit(Header &&headers, std::string_view url, AbstractSession::Method method,
          const std::string &body) noexcept;
 
   /**
@@ -64,23 +66,27 @@ public:
    * @param weight
    * @return
    */
-  std::tuple<boost::system::error_code, int32_t>
-  submit(Header &&headers, std::string_view url, Method method,
+  std::tuple<AbstractSession::ErrorCode, int32_t>
+  submit(Header &&headers, std::string_view url, AbstractSession::Method method,
          int32_t stream_id, int32_t weight) noexcept;
 
-  Socket &socket() override;
+  /*!
+   * \brief socket
+   * \return
+   */
+  AbstractSession::Socket &socket() override;
 
   /**
    * @brief readSocket
    * @param handler
    */
-  void readSocket(Handler handler) noexcept override;
+  void readSocket(AbstractSession::Handler handler) noexcept override;
 
   /**
    * @brief writeSocket
    * @param h
    */
-  void writeSocket(Handler h) noexcept override;
+  void writeSocket(AbstractSession::Handler h) noexcept override;
 
   /**
    * @brief shutdownSocket
@@ -92,8 +98,8 @@ public:
    * @param endpoint_it
    * @param ec
    */
-  void startConnect(EndpointIt endpoint_it,
-                    boost::system::error_code &ec) override;
+  void startConnect(AbstractSession::EndpointIt endpoint_it,
+                    AbstractSession::ErrorCode &ec) override;
 
   /**
    * @brief startResolve
@@ -106,28 +112,17 @@ public:
    * @param method
    * @return
    */
-  static constexpr std::string_view stringFromEnum(Method method);
+  static constexpr std::string_view
+  stringFromEnum(AbstractSession::Method method);
 
   /**
    * @brief methodFromString
    * @param method
    * @return
    */
-  static Method methodFromString(const std::string &method);
+  static AbstractSession::Method methodFromString(const std::string &method);
 
 private:
-  /**
-   * @brief Default onResponce handler
-   */
-  //  static void onResponce(const Responce &);
-
-  /**
-   * @brief Default onData handler
-   * @param Pointer to data
-   * @param Data lenght
-   */
-  //  static void onData(const uint8_t *data, std::size_t len);
-
   struct Impl;
   std::unique_ptr<Impl, void (*)(Impl *)> d;
 };

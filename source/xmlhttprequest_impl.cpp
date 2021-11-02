@@ -160,7 +160,7 @@ std::tuple<bool, XMLHttpRequest::Impl::Elements>
 XMLHttpRequest::Impl::proccessUri(const std::string &uri) noexcept {
   if (uri.empty())
     return {};
-  std::cerr << protoIpPortUrlRegex << "\n";
+
   if (boost::smatch what;
       boost::regex_search(uri, what, boost::regex{protoIpPortUrlRegex})) {
     //'what' variable is it const refence (usage of move semantics is it
