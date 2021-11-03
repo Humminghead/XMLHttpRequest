@@ -17,6 +17,10 @@ public:
   using data_type = std::vector<chunk_type>;
 
   Responce();
+  ~Responce() = default;
+
+  Responce(Responce &&) = default;
+  Responce &operator=(Responce &&) = default;
 
   Responce(const Responce &) = delete;
   Responce &operator=(const Responce &) = delete;

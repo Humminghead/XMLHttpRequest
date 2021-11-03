@@ -12,6 +12,10 @@ class Header;
 class Request {
 public:
   Request();
+  ~Request() = default;
+
+  Request(Request &&) = default;
+  Request &operator=(Request &&) = default;
 
   Request(const Request &) = delete;
   Request &operator=(const Request &) = delete;
