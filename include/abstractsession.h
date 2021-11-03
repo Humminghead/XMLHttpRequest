@@ -3,11 +3,7 @@
 #include "literals.h"
 #include "types.h"
 
-#include <array>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/system/error_category.hpp>
-#include <memory>
-#include <utility>
 
 /**
  * Forward declations
@@ -31,12 +27,6 @@ class Header;
 namespace network {
 using namespace network::literals;
 
-class NetworkErrorCategory : public boost::system::error_category {
-public:
-  const char *name() const noexcept;
-  std::string message(int ev) const;
-};
-
 class AbstractSession : public std::enable_shared_from_this<AbstractSession> {
 public:
   using ErrorCode = boost::system::error_code;
@@ -44,10 +34,7 @@ public:
   using EndpointIt = boost::asio::ip::tcp::resolver::iterator;
   using Socket = boost::asio::ip::tcp::socket;
   using Handler = std::function<void(const ErrorCode &ec, std::size_t n)>;
-
   using SessionHolder = std::function<std::shared_ptr<AbstractSession>()>;
-
-  template <size_t N> using Array = std::array<uint8_t, N>;
 
   /**
    * @brief Supported header methods
@@ -65,8 +52,6 @@ public:
   virtual void readSocket(Handler h) noexcept = 0;
   virtual void writeSocket(Handler h) noexcept = 0;
   virtual void shutdownSocket() noexcept = 0;
-
-  ErrorCode &getError() const;
 
   void startResolve(const std::string &host, const std::string &service,
                     ErrorCode &ec) noexcept;
@@ -138,5 +123,4 @@ private:
   std::unique_ptr<Impl, void (*)(Impl *)> d;
 };
 
-using AbstractSessionPtr = std::shared_ptr<AbstractSession>;
 } // namespace network

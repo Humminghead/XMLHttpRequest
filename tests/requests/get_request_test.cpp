@@ -5,12 +5,15 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 
+#include "httprequest.h"
+#include "httpresponce.h"
+
 int main() {
   using namespace network;
   spdlog::set_level(spdlog::level::trace); // Set global log level to debug
 
   XMLHttpRequest req( //
-      "GET", "https://mapgl.2gis.com/api/fonts/Noto_Sans_4.pbf", true);
+      "GET", "https://mapgl.2gis.com/api/fonts/Noto_Sans_4.pbf", false);
 
   // clang-format off
       req.setRequestHeader("accept", "*/*");

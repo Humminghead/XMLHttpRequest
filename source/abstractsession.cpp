@@ -14,6 +14,7 @@
 #include <boost/asio/deadline_timer.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/system/error_code.hpp>
 #include <nghttp2/nghttp2.h>
 #include <spdlog/spdlog.h>
 #include <string>
@@ -44,7 +45,6 @@ struct AbstractSession::Impl {
         resolver_(service) {}
 
   boost::asio::io_service &service;
-  ErrorCode ec;
 
   std::mutex nghttp2_session_mutex_;
   nghttp2_session *session{nullptr};
@@ -328,8 +328,6 @@ void AbstractSession::setStopped(bool stopped) noexcept {
   d->stopped = stopped;
 }
 
-AbstractSession::ErrorCode &AbstractSession::getError() const { return d->ec; }
-
 void AbstractSession::onSocketConnected(
     AbstractSession::EndpointIt endpoint_it) {
   (void)endpoint_it;
@@ -338,7 +336,8 @@ void AbstractSession::onSocketConnected(
   setStopped(false);
 
   if (!d->setupSession()) {
-    d->ec.assign(NGHTTP2_ERR_FATAL, NetworkErrorCategory{});
+    ///\todo
+    //    d->ec.assign(NGHTTP2_ERR_FATAL, NetworkErrorCategory{});
     return;
   }
 
@@ -386,14 +385,6 @@ onStateChangeCallback &AbstractSession::getOnStateChangeCallback() const {
   return d->onReadyStateChange;
 }
 
-const char *NetworkErrorCategory::name() const noexcept {
-  return "network_module_error";
-}
-
-std::string NetworkErrorCategory::message(int ev) const {
-  return "nghttp2 network error: " + std::to_string(ev);
-}
-
 std::tuple<AbstractSession::ErrorCode, int32_t>
 AbstractSession::submit(std::string_view url,    //
                         std::string_view method, //
@@ -403,9 +394,11 @@ AbstractSession::submit(std::string_view url,    //
                         const bool isExclusive,  //
                         const void *dataProvider) noexcept {
   if (isStopped()) {
-    return {
-        {static_cast<nghttp2_error>(NGHTTP2_ERR_FATAL), NetworkErrorCategory{}},
-        -1};
+    ///\todo add error code
+    return {};
+    //    return {
+    //        {static_cast<nghttp2_error>(NGHTTP2_ERR_FATAL),
+    //        NetworkErrorCategory{}}, -1};
   }
 
   if (http_parser_parse_url(url.data(), url.size(), 0, &d->parser) != 0) {
@@ -472,9 +465,12 @@ AbstractSession::submit(std::string_view url,    //
                              &strm);
 
   if (assignedId < 0) {
-    return {{static_cast<nghttp2_error>(NGHTTP2_ERR_STREAM_ID_NOT_AVAILABLE),
-             NetworkErrorCategory{}},
-            assignedId};
+    ///\todo add error code
+    return {};
+    //    return
+    //    {{static_cast<nghttp2_error>(NGHTTP2_ERR_STREAM_ID_NOT_AVAILABLE),
+    //             NetworkErrorCategory{}},
+    //            assignedId};
   }
 
   if (auto locked = d->insideCb.try_lock(); locked) {
@@ -512,13 +508,9 @@ size_t AbstractSession::cancelPing() noexcept {
   return d->ping.cancel();
 }
 
-AbstractSession::Array<64_Kb> &AbstractSession::getReadBuffer() noexcept {
-  return d->rb_;
-}
+Array<64_Kb> &AbstractSession::getReadBuffer() noexcept { return d->rb_; }
 
-AbstractSession::Array<64_Kb> &AbstractSession::getWriteBuffer() noexcept {
-  return d->wb_;
-}
+Array<64_Kb> &AbstractSession::getWriteBuffer() noexcept { return d->wb_; }
 
 size_t AbstractSession::getWriteBufferSize() const noexcept {
   return d->wblen_;
@@ -580,9 +572,13 @@ AbstractSession::ErrorCode AbstractSession::goAway(uint32_t streamId) noexcept {
   if (auto it = d->streams.find(streamId); it != d->streams.end()) {
     auto ret = nghttp2_submit_goaway(d->session, NGHTTP2_FLAG_NONE, streamId,
                                      NGHTTP2_NO_ERROR, nullptr, 0);
-    return {ret, NetworkErrorCategory{}};
+    ///\todo add error code
+    return {};
+    //    return {ret, NetworkErrorCategory{}};
   }
-  return {NGHTTP2_ERR_INVALID_STREAM_ID, NetworkErrorCategory{}};
+  ///\todo add error code
+  return {};
+  //  return {NGHTTP2_ERR_INVALID_STREAM_ID, NetworkErrorCategory{}};
 }
 
 std::shared_ptr<Stream>

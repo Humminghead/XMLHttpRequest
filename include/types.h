@@ -1,22 +1,24 @@
 #pragma once
 
+#include <array>
 #include <functional>
-#include <utility>
 #include <memory>
-//#include <vector>
+#include <utility>
 
+// clang-format off
 namespace network {
 
 class Request;
 class Responce;
 
 // Session callbacks types
-using onReadyCallback = std::function<void(
-    std::pair<std::shared_ptr<Request>, std::shared_ptr<Responce>> &&)>;
+using onReadyCallback = std::function<void(std::pair<std::shared_ptr<Request>, std::shared_ptr<Responce>> &&)>;
 using onStopCallback = std::function<void()>;
 using onConnectCallback = std::function<void()>;
 using onStateChangeCallback = std::function<void(const uint8_t)>;
 using onTimeoutCallback = std::function<void()>;
 
-//template <typename T = uint8_t> using BufferType = std::vector<T>;
+// Basic array type
+template <size_t N> using Array = std::array<uint8_t, N>;
+
 }
