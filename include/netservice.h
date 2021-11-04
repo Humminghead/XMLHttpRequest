@@ -16,6 +16,9 @@ public:
              boost::asio::ssl::context &tlsCtx, const std::string &hst,
              const std::string &srv)
       : service_{io_service}, host_{hst}, port_{srv}, sock_{service_, tlsCtx} {
+    //    https://ywjheart.wordpress.com/2016/02/28/solve-sslv3-alert-handshake-failure-error/
+    SSL_set_tlsext_host_name(sock_.native_handle(), host_.c_str());
+
     sock_.set_verify_callback(boost::asio::ssl::rfc2818_verification(host_));
   }
   auto socket() noexcept { return &sock_; }
@@ -30,4 +33,4 @@ private:
   std::string port_;
   boost::asio::ssl::stream<AbstractSession::Socket> sock_;
 };
-} // namespace::network
+} // namespace network
