@@ -456,6 +456,12 @@ void XMLHttpRequest::fetch() {
   spdlog::trace("{} Perform \"XMLHttpRequest::fetch()\" function",
                 pthread_self());
 
+  if (d->session->isStopped()) {
+    spdlog::trace("{} \"XMLHttpRequest::fetch()\" Session stoppped. Exit!",
+                  pthread_self());
+    return;
+  }
+
   if (auto id = d->fetch(d->method,
                          d->proto + "://" + d->addr + ":" + d->port + d->urn);
       id < 0) {
