@@ -98,7 +98,9 @@ bool XMLHttpRequest::Impl::setupSession() noexcept {
 
   this->service = std::make_shared<boost::asio::io_service>();
   this->contextSsl = std::make_shared<boost::asio::ssl::context>(
-      boost::asio::ssl::context::tlsv13_client);
+      boost::asio::ssl::context::tlsv12_client);
+  this->contextSsl->set_options(boost::asio::ssl::context::tlsv12_client |
+                                boost::asio::ssl::context::tlsv13_client);
 
   if (!ssl_certificate.empty() &&
       utils::ssl::loadCertificate(ssl_certificate.data(), *contextSsl, ec)
