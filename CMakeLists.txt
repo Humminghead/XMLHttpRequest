@@ -88,3 +88,11 @@ if(BUILD_TESTING)
     enable_testing()
     add_subdirectory(${CMAKE_SOURCE_DIR}/tests)
 endif()
+
+#--------------------------------------------------------------------
+# Options
+#--------------------------------------------------------------------
+option(ENABLE_DEBUG_SSL "Enables decode of tls encrypted traffic in wireshark" OFF)
+if(ENABLE_DEBUG_SSL)
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE DEBUG_SSL)
+endif()
