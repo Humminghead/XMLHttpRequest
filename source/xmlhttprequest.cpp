@@ -348,59 +348,6 @@ void XMLHttpRequest::sendGet() {
   }
 }
 
-struct A {
-  A() {
-    ex_counter++;
-    n = ex_counter;
-    spdlog::trace("Construct A() {}, ex_cnt:{}", to_hex((size_t)this),
-                  ex_counter);
-  }
-  ~A() {
-    ex_counter--;
-    spdlog::trace("Destruct ~A() {}, ex_cnt:{}", to_hex((size_t)this),
-                  ex_counter);
-  }
-  A(const A &a) {
-    ex_counter++;
-    n = ex_counter;
-    spdlog::trace("Copy construct A() A{} ---> A{}, ex,cnt:{}",
-                  to_hex((size_t)&a), to_hex((size_t)this), ex_counter);
-    test = a.test;
-  }
-  A &operator=(A &a) {
-    spdlog::trace("Copy assigment of A{} ---> A{}, ex,cnt:{}",
-                  to_hex((size_t)&a), to_hex((size_t)this), ex_counter);
-    test = a.test;
-    return *this;
-  }
-
-  A(A &&a) {
-    ex_counter++;
-    n = ex_counter;
-    spdlog::trace("Move construct A() A{} ---> A{}, ex,cnt:{}",
-                  to_hex((size_t)&a), to_hex((size_t)this), ex_counter);
-    test = std::move(a.test);
-  }
-  A &operator=(A &&a) {
-    spdlog::trace("Move assigment of A{} ---> A{}, ex,cnt:{}",
-                  to_hex((size_t)&a), to_hex((size_t)this), ex_counter);
-
-    test = std::move(a.test);
-    return *this;
-  }
-
-  std::string to_hex(size_t val) {
-    std::stringstream ss{};
-    ss << std::hex << val;
-    return ss.str();
-  }
-
-  static size_t ex_counter;
-  size_t n{0};
-  std::string test{"its test string"};
-};
-size_t A::ex_counter{0};
-
 void XMLHttpRequest::sendPost(std::string &&body) {
   spdlog::trace("{} XMLHttpRequest::sendPost()", pthread_self());
   //  {
