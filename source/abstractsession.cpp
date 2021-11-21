@@ -197,7 +197,7 @@ void AbstractSession::read() noexcept {
                   bytes_transferred);
 
     if (bytes_transferred == 0) {
-      spdlog::trace("{} Bytes transferred - exit!", pthread_self());
+      spdlog::trace("{} Bytes transferred == 0 - exit!", pthread_self());
       return;
     }
 
@@ -312,6 +312,19 @@ void AbstractSession::write() noexcept {
       spdlog::error("{}{}{}", pthread_self(), ec.value(), ec.message());
       self->stop();
       return;
+    }
+
+    if (auto &streams = self->d->streams; streams.size()) {
+      if (auto iter = streams.find(0); iter != std::end(streams)) {
+        if (auto [id, stream] = *iter;
+            stream->state() == Stream::State::Closed) {
+          spdlog::trace("{} Write canceled because session Stream0 is closed! "
+                        "Session stopped!",
+                        pthread_self());
+          self->stop();
+          return;
+        }
+      }
     }
 
     std::fill_n(std::begin(self->d->wb_), self->d->wblen_, 0x0);
