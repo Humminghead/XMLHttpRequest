@@ -24,16 +24,15 @@ set(LIB_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 message(STATUS "XMLHttpRequest: Version " ${LIB_VERSION})
 
 project(XMLHttpRequest VERSION ${LIB_VERSION} LANGUAGES CXX)
-
 #--------------------------------------------------------------------
 # Update module path
 #--------------------------------------------------------------------
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 
 #--------------------------------------------------------------------
 # Add third party software
 #--------------------------------------------------------------------
-add_subdirectory(${CMAKE_SOURCE_DIR}/third-party)
+add_subdirectory(${PROJECT_SOURCE_DIR}/third-party)
 
 #--------------------------------------------------------------------
 # Add sources
@@ -44,12 +43,12 @@ find_package(nghttp2 REQUIRED)
 
 file (GLOB SRC_FILES source/*)
 
-add_library(${CMAKE_PROJECT_NAME} STATIC ${SRC_FILES} $<TARGET_OBJECTS:url-parser>)
-#add_dependencies(${CMAKE_PROJECT_NAME} url-parser)
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES} $<TARGET_OBJECTS:url-parser>)
+#add_dependencies(${PROJECT_NAME} url-parser)
 
-target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC
+target_link_libraries(${PROJECT_NAME} PRIVATE
      -lboost_regex
      -lboost_thread
      -lcrypto
@@ -61,7 +60,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC
 #--------------------------------------------------------------------
 # Create install target
 #--------------------------------------------------------------------
-set(LIB_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(LIB_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/include)
 
 file(GLOB_RECURSE HEADER_FILES ${LIB_INCLUDE_PATH}/*.h)
 
@@ -69,12 +68,12 @@ foreach(header_path ${HEADER_FILES})
     string(CONCAT INSTALLED_INCLUDES "${INSTALLED_INCLUDES}${header_path}\;")
 endforeach()
 
-set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+set_target_properties(${PROJECT_NAME} PROPERTIES
       LIBRARY_OUTPUT_DIRECTORY ${CMAKE_INSTALL_LIBDIR}
       PUBLIC_HEADER ${INSTALLED_INCLUDES}
 )
 
-install(TARGETS ${CMAKE_PROJECT_NAME}
+install(TARGETS ${PROJECT_NAME}
         PUBLIC_HEADER
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
@@ -86,7 +85,7 @@ if(BUILD_TESTING)
     message( STATUS "\"BUILD_TESTING\" option is ON")
 
     enable_testing()
-    add_subdirectory(${CMAKE_SOURCE_DIR}/tests)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/tests)
 endif()
 
 #--------------------------------------------------------------------
@@ -94,5 +93,5 @@ endif()
 #--------------------------------------------------------------------
 option(ENABLE_DEBUG_SSL "Enables decode of tls encrypted traffic in wireshark" OFF)
 if(ENABLE_DEBUG_SSL)
-    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE DEBUG_SSL)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG_SSL)
 endif()
