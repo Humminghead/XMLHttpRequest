@@ -1,9 +1,12 @@
 #include "sessioncallbacks.h"
 
+#include <algorithm>
+#include <ctype.h>
 #include <spdlog/spdlog.h>
 
 #include "abstractsession.h"
 #include "http2.h"
+#include "httpheader.h"
 #include "httpheadervalue.h"
 #include "httprequest.h"
 #include "httpresponce.h"
@@ -85,6 +88,32 @@ int onHeaderCallback(nghttp2_session *session, const nghttp2_frame *frame,
         res->statusCode(session_utils::parse_uint(value, valuelen));
       } else if (token == http2::HD_CONTENT_LENGTH) {
         res->contentLength(session_utils::parse_uint(value, valuelen));
+      } else if (token == http2::HD_CONTENT_TYPE) {
+        // Set overriden mime type
+        if (auto &type = s->getMimeOverridenType(); !type.empty()) {
+          if (auto commaPos = type.find_first_of(';');
+              commaPos != std::string::npos && commaPos + 1 <= type.size()) {
+            auto [name, value] =
+                std::tuple{type.substr(0, commaPos),
+                           type.substr(commaPos + 1, type.size())};
+
+            // Clear all spaces
+            value.erase(std::remove_if(value.begin(), value.end(),
+                                       [](const auto c) { //
+                                         return std::isspace(c);
+                                       }),
+                        value.end());
+
+            spdlog::debug("{} Set overriden mime type: Token: {} Value: {}",
+                          pthread_self(), name, value);
+
+            res->header().emplace(
+                std::move(name),
+                HeaderValue{std::move(value),
+                            (flags & NGHTTP2_NV_FLAG_NO_INDEX) != 0});
+          }
+          break;
+        }
       }
 
       // Save header field
@@ -291,7 +320,7 @@ int onDataChunkRecvCallback(nghttp2_session *session, uint8_t flags,
   if (auto strm = s->findStream(stream_id); strm) {
     auto res = strm->response();
     spdlog::trace("{} Call res->onData(data,{}) ", pthread_self(), len);
-    res->onData(data, len);
+    res->data(data, len);
   } else {
     spdlog::trace("{} Stream {} not found ", pthread_self(), stream_id);
   }

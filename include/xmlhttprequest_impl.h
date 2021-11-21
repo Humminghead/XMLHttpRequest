@@ -19,6 +19,7 @@ namespace network {
 class HttpTlsSession;
 
 struct XMLHttpRequest::Impl {
+  ///\todo del duplicate class members
   struct Elements {
     std::string addr{};
     std::string port{};
@@ -32,7 +33,15 @@ struct XMLHttpRequest::Impl {
   std::tuple<bool, Elements> proccessUri(const std::string &uri) noexcept;
 
   bool setupSession() noexcept;
-  //  std::mutex sessionMutex;
+
+  const std::string &certificate_ssl() const noexcept;
+
+  void certificate_ssl(std::string &&cert) noexcept;
+
+  void certificate_ssl(const std::string &cert) noexcept;
+
+  void certificate_ssl(const std::string_view &cert) noexcept;
+
   std::shared_ptr<HttpTlsSession> session{nullptr};
 
   // Setup context and IO service
@@ -46,6 +55,7 @@ struct XMLHttpRequest::Impl {
   std::string urn{};
   std::string method{};
   std::string body{};
+  std::string ssl_certificate{};
   Header header{};
   std::shared_ptr<Responce> responce{nullptr};
 
@@ -60,4 +70,4 @@ struct XMLHttpRequest::Impl {
   std::shared_ptr<boost::asio::steady_timer> timer{nullptr};
   onTimeoutCallback timerCallback;
 };
-} // namespace::network
+} // namespace network

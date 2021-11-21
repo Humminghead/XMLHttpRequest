@@ -98,10 +98,12 @@ bool XMLHttpRequest::Impl::setupSession() noexcept {
 
   this->service = std::make_shared<boost::asio::io_service>();
   this->contextSsl = std::make_shared<boost::asio::ssl::context>(
-      boost::asio::ssl::context::tlsv13_client);
+      boost::asio::ssl::context::tlsv12_client);
+  this->contextSsl->set_options(boost::asio::ssl::context::tlsv12_client |
+                                boost::asio::ssl::context::tlsv13_client);
 
-  if (utils::ssl::loadCertificate(defaults::certificate->data(), *contextSsl,
-                                  ec)
+  if (!ssl_certificate.empty() &&
+      utils::ssl::loadCertificate(ssl_certificate.data(), *contextSsl, ec)
           .failed()) {
     spdlog::error("{} {}", pthread_self(), "Certificate load failed! ");
     return false;
@@ -139,11 +141,28 @@ bool XMLHttpRequest::Impl::setupSession() noexcept {
   return false;
 }
 
+const std::string &XMLHttpRequest::Impl::certificate_ssl() const noexcept {
+  return ssl_certificate;
+}
+
+void XMLHttpRequest::Impl::certificate_ssl(std::string &&cert) noexcept {
+  ssl_certificate = std::move(cert);
+}
+
+void XMLHttpRequest::Impl::certificate_ssl(const std::string &cert) noexcept {
+  ssl_certificate = cert;
+}
+
+void XMLHttpRequest::Impl::certificate_ssl(
+    const std::string_view &cert) noexcept {
+  ssl_certificate = cert;
+}
+
 std::tuple<bool, XMLHttpRequest::Impl::Elements>
 XMLHttpRequest::Impl::proccessUri(const std::string &uri) noexcept {
   if (uri.empty())
     return {};
-  std::cerr << protoIpPortUrlRegex << "\n";
+
   if (boost::smatch what;
       boost::regex_search(uri, what, boost::regex{protoIpPortUrlRegex})) {
     //'what' variable is it const refence (usage of move semantics is it

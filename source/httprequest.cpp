@@ -15,7 +15,7 @@ struct Request::Impl {
 
 Request::Request() : d(new Request::Impl(), [](auto p) { delete p; }) {}
 
-void Request::scheme(const char *value, size_t len) noexcept {
+void Request::scheme(const char *value, const size_t len) noexcept {
   (void)value;
   (void)len;
 
@@ -23,14 +23,14 @@ void Request::scheme(const char *value, size_t len) noexcept {
   //  d->scheme_.assign(value, len);
 }
 
-void Request::host(const char *value, size_t len) noexcept {
+void Request::host(const char *value, const size_t len) noexcept {
   (void)value;
   (void)len;
 
   ///\todo
 }
 
-void Request::method(const char *value, size_t len) noexcept {
+void Request::method(const char *value, const size_t len) noexcept {
   (void)value;
   (void)len;
 
@@ -72,4 +72,4 @@ void Request::header(std::string name, HeaderValue &&value) noexcept {
   d->header_.emplace(std::move(name), std::move(value));
 }
 
-} // namespace::network
+} // namespace network

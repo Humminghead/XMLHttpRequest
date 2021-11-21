@@ -42,7 +42,7 @@ HttpTlsSession::HttpTlsSession(boost::asio::io_service &io_service,
           boost::posix_time::seconds(defaults::http_read_timeout)),
       d(new Impl(io_service, tlsCtx, host, service), implDeleter) {}
 
-std::tuple<boost::system::error_code, int32_t>
+std::tuple<AbstractSession::ErrorCode, int32_t>
 HttpTlsSession::submit(std::string_view url, std::string_view method,
                        Header &&header, int32_t &stream_id, int32_t &weight,
                        const bool exclusive = false) noexcept {
@@ -50,7 +50,7 @@ HttpTlsSession::submit(std::string_view url, std::string_view method,
                                  weight, exclusive);
 }
 
-std::tuple<boost::system::error_code, int32_t>
+std::tuple<AbstractSession::ErrorCode, int32_t>
 HttpTlsSession::submit(Header &&headers, std::string_view url,
                        Method method) noexcept {
   int32_t id{0};
@@ -64,7 +64,7 @@ HttpTlsSession::submit(Header &&headers, std::string_view url,
   );
 }
 
-std::tuple<boost::system::error_code, int32_t>
+std::tuple<AbstractSession::ErrorCode, int32_t>
 HttpTlsSession::submit(Header &&headers, std::string_view url, Method method,
                        const std::string &body) noexcept {
   int32_t id{0};
@@ -109,7 +109,7 @@ HttpTlsSession::submit(Header &&headers, std::string_view url, Method method,
                                  false, &provider);
 }
 
-std::tuple<boost::system::error_code, int32_t>
+std::tuple<AbstractSession::ErrorCode, int32_t>
 HttpTlsSession::submit(Header &&headers, std::string_view url, Method method,
                        int32_t id, int32_t weight) noexcept {
   return this->submit(url,                           //
@@ -125,11 +125,12 @@ AbstractSession::Socket &HttpTlsSession::socket() {
 }
 
 void HttpTlsSession::startConnect(AbstractSession::EndpointIt endpoint_it,
-                                  boost::system::error_code &ec) {
+                                  AbstractSession::ErrorCode &ec) {
 
   if (!isStopped()) {
-    ec.assign(static_cast<nghttp2_error>(NGHTTP2_INTERNAL_ERROR),
-              NetworkErrorCategory{});
+    ///\todo add error code assign
+    //    ec.assign(static_cast<nghttp2_error>(NGHTTP2_INTERNAL_ERROR),
+    //              NetworkErrorCategory{});
     return;
   }
 
@@ -155,14 +156,14 @@ void HttpTlsSession::startConnect(AbstractSession::EndpointIt endpoint_it,
 }
 
 bool HttpTlsSession::startResolve() {
-  boost::system::error_code ec;
+  AbstractSession::ErrorCode ec;
   AbstractSession::startResolve(*d->service_.host(), *d->service_.port(), ec);
   return !ec.failed();
 }
 
 void HttpTlsSession::readSocket(AbstractSession::Handler handler) noexcept {
   try {
-    boost::system::error_code ec;
+    AbstractSession::ErrorCode ec;
 
     d->service_.socket()->async_read_some(boost::asio::buffer(getReadBuffer()),
                                           handler);
