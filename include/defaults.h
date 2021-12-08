@@ -5,8 +5,6 @@
 
 // clang-format off
 namespace network::defaults {
-///\brief Default log path
-[[maybe_unused]] static constexpr std::string_view network_log_path{R"(/var/log)"};
 ///\brief Http connect timeout(seconds)
 [[maybe_unused]] static constexpr std::size_t http_connect_timeout{0};
 ///\brief Http read socket timeout(seconds)
