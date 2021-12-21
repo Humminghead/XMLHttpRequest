@@ -29,6 +29,17 @@ XMLHttpRequest::XMLHttpRequest(std::string &&method, std::string &&url,
     spdlog::error("{} Error while session setup", pthread_self());
 }
 
+XMLHttpRequest::XMLHttpRequest(const std::string_view method,
+                               const std::string_view url, bool async)
+    : d{new Impl(), [](auto *p) { delete p; }} {
+
+  if (auto ok = this->prepare(method.data(), url.data(), async); !ok)
+    spdlog::error("{} Error while session prepare", pthread_self());
+
+  if (auto ok = setup(); !ok)
+    spdlog::error("{} Error while session setup", pthread_self());
+}
+
 void XMLHttpRequest::abort() {
   spdlog::trace("{} XMLHttpRequest::abort()", pthread_self());
   d->service->stop();
@@ -152,11 +163,6 @@ void XMLHttpRequest::send(onReadyCallback &&cb) {
   send();
 }
 
-void XMLHttpRequest::send(ArrayBuffer<> &&array) {
-  ///\todo
-  ///
-}
-
 void XMLHttpRequest::send(std::string &&body) {
   this->sendPost(std::move(body));
 }
@@ -234,11 +240,17 @@ void XMLHttpRequest::timeout(const size_t milliseconds) noexcept {
                   pthread_self());
     return;
   }
-
+  spdlog::debug("{} Timeout was set to {} milliseconds! ", pthread_self(),
+                milliseconds);
   d->timeout = std::chrono::milliseconds(milliseconds);
 }
 
 size_t XMLHttpRequest::timeout() const { return d->timeout.count(); }
+
+std::shared_ptr<Responce> XMLHttpRequest::responce() const {
+  ///\todo
+  return nullptr;
+}
 
 void XMLHttpRequest::initCallbacks() noexcept {
   if (d->readyState != ReadyState::Unsent)

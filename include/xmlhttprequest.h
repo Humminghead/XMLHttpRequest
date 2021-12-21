@@ -17,6 +17,8 @@ public:
 
   XMLHttpRequest();
   XMLHttpRequest(std::string &&method, std::string &&url, bool async);
+  XMLHttpRequest(const std::string_view method, const std::string_view url,
+                 bool async);
 
   void abort();
   std::string getAllResponseHeaders();
@@ -30,17 +32,12 @@ public:
   void overrideMimeType(std::string &&mime);
   void send();
   void send(onReadyCallback &&);
-  void send(ArrayBuffer<> &&array);
-  //    void send(ArrayBufferView data);
-  //    void send(Blob data);
-  //    void send(Document data);
   void send(std::string &&body);
-  //    void send(FormData data);
+
   void setRequestHeader(const std::string &header, const std::string &value);
   void setRequestHeader(std::string &&header, std::string &&value);
-  //    Нестандартные методы
-  //    void init(in nsIPrincipal principal, in nsIScriptContext scriptContext,
-  //    in nsPIDOMWindow ownerWindow);
+
+  // Нестандартные методы
   void openRequest(std::string method, std::string url, bool async,
                    std::string user, std::string password);
 
@@ -50,6 +47,8 @@ public:
 
   void timeout(const size_t milliseconds) noexcept;
   size_t timeout() const;
+
+  std::shared_ptr<Responce> responce() const;
 
 private:
   void initCallbacks() noexcept;
