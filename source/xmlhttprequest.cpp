@@ -248,8 +248,7 @@ void XMLHttpRequest::timeout(const size_t milliseconds) noexcept {
 size_t XMLHttpRequest::timeout() const { return d->timeout.count(); }
 
 std::shared_ptr<Responce> XMLHttpRequest::responce() const {
-  ///\todo
-  return nullptr;
+  return d->responce;
 }
 
 void XMLHttpRequest::initCallbacks() noexcept {
@@ -362,15 +361,6 @@ void XMLHttpRequest::sendGet() {
 
 void XMLHttpRequest::sendPost(std::string &&body) {
   spdlog::trace("{} XMLHttpRequest::sendPost()", pthread_self());
-  //  {
-  //  auto ddd = A{};
-
-  //    auto test = [zzz_ = std::move(ddd)]() {
-  //      spdlog::debug("{} Test happens!", pthread_self());
-  //    };
-
-  //    d->service->post(test);
-  //  }
 
   if (!d->service || !d->session)
     return;

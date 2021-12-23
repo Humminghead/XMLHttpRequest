@@ -37,7 +37,6 @@ public:
   void setRequestHeader(const std::string &header, const std::string &value);
   void setRequestHeader(std::string &&header, std::string &&value);
 
-  // Нестандартные методы
   void openRequest(std::string method, std::string url, bool async,
                    std::string user, std::string password);
 
