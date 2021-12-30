@@ -16,11 +16,16 @@
 
 namespace network {
 
-XMLHttpRequest::XMLHttpRequest() : d{new Impl(), [](auto *p) { delete p; }} {}
+XMLHttpRequest::XMLHttpRequest() : d{new Impl(), [](auto *p) { delete p; }} {
+  spdlog::debug("{} Create new XMLHttpRequest()", pthread_self());
+}
 
 XMLHttpRequest::XMLHttpRequest(std::string &&method, std::string &&url,
                                bool async)
     : d{new Impl(), [](auto *p) { delete p; }} {
+
+  spdlog::debug("{} Create new XMLHttpRequest({}, {}, {})", pthread_self(),
+                method, url, async);
 
   if (auto ok = this->prepare(std::move(method), std::move(url), async); !ok)
     spdlog::error("{} Error while session prepare", pthread_self());
@@ -32,6 +37,9 @@ XMLHttpRequest::XMLHttpRequest(std::string &&method, std::string &&url,
 XMLHttpRequest::XMLHttpRequest(const std::string_view method,
                                const std::string_view url, bool async)
     : d{new Impl(), [](auto *p) { delete p; }} {
+
+  spdlog::debug("{} Create new XMLHttpRequest({}, {}, {})", pthread_self(),
+                method, url, async);
 
   if (auto ok = this->prepare(method.data(), url.data(), async); !ok)
     spdlog::error("{} Error while session prepare", pthread_self());
@@ -257,7 +265,7 @@ void XMLHttpRequest::initCallbacks() noexcept {
 
   if (!d->session->getOnStateChangeCallback()) {
     d->session->setOnStateChangeCallback([&](const uint8_t state) {
-      spdlog::debug("{} Invoke onStateChangeCallback in "
+      spdlog::trace("{} Invoke onStateChangeCallback in "
                     "XMLHttpRequest::initCallbacks(), set state: {}",
                     pthread_self(), readyStateToString(state));
       d->readyState = static_cast<ReadyState>(state);
@@ -273,6 +281,10 @@ void XMLHttpRequest::initCallbacks() noexcept {
 
 bool XMLHttpRequest::prepare(std::string &&method, std::string &&uri,
                              bool async) {
+
+  std::transform(std::begin(method), std::end(method), std::begin(method),
+                 [](unsigned char c) { return std::toupper(c); });
+
   d->isAsync = async;
 
   auto [ok, elements] = d->proccessUri(uri);
