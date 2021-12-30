@@ -140,6 +140,8 @@ AbstractSession::~AbstractSession() { nghttp2_session_del(d->session); }
 void AbstractSession::startResolve(const std::string &host,
                                    const std::string &service,
                                    ErrorCode &ec) noexcept {
+  spdlog::trace("{} AbstractSession::startResolve({}, {}, {})", pthread_self(),
+                host, service, ec.message());
 
   auto endpoint = d->resolver_.resolve(host, service, ec);
 

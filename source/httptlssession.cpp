@@ -141,6 +141,8 @@ void HttpTlsSession::startConnect(AbstractSession::EndpointIt endpoint_it,
     spdlog::error("{} {}", pthread_self(), ec.message());
     return;
   }
+  spdlog::debug("{} Connected to : {}", pthread_self(),
+                endpoint_it->host_name());
 
   d->service_.socket()->handshake(boost::asio::ssl::stream_base::client, ec);
 
