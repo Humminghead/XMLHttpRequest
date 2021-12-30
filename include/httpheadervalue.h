@@ -15,6 +15,8 @@ struct HeaderValue {
 
   std::string value{};
 
+  const std::string_view view() const { return value; }
+
   // true if the header field value is sensitive information, such as
   // authorization information or short length secret cookies.  If
   // true, those header fields are not indexed by HPACK (but still
