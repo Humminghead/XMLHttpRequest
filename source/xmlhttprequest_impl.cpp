@@ -47,7 +47,8 @@ int32_t XMLHttpRequest::Impl::fetch(const std::string &method,
                                     const std::string &uri)
 
 {
-  spdlog::trace("{} XMLHttpRequest::Impl::fetch({})", pthread_self(), uri);
+  spdlog::debug("{} XMLHttpRequest::Impl::fetch({}, {})", pthread_self(),
+                method, uri);
 
   // Get return value type
   //    using submit_ret_t = decltype(
@@ -73,8 +74,8 @@ int32_t XMLHttpRequest::Impl::fetch(const std::string &method,
 int32_t XMLHttpRequest::Impl::fetch(const std::string &method,
                                     const std::string &uri,
                                     const std::string &body) {
-  ///\todo
-  ///
+  spdlog::debug("{} XMLHttpRequest::Impl::fetch({}, {}, {})", pthread_self(),
+                method, uri, body);
   auto methodValue = HttpTlsSession::methodFromString(method);
 
   if (uri.empty() || !session ||

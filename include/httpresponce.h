@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 #include <vector>
 
 namespace network {
@@ -39,6 +40,8 @@ public:
 
   const data_type &data() const;
   void data(const uint8_t *data, const size_t len);
+
+  const std::string text() const;
 };
 
 } // namespace network
