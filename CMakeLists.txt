@@ -91,7 +91,7 @@ endif()
 #--------------------------------------------------------------------
 # Options
 #--------------------------------------------------------------------
-option(ENABLE_DEBUG_SSL "Enables decode of tls encrypted traffic in wireshark" OFF)
+option(ENABLE_DEBUG_SSL "Enables decode of tls encrypted traffic in wireshark (/tmp/ssl-key-log.txt)" OFF)
 if(ENABLE_DEBUG_SSL)
     target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG_SSL)
 endif()
