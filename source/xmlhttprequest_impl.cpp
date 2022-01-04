@@ -161,11 +161,23 @@ void XMLHttpRequest::Impl::certificate_ssl(
 
 std::tuple<bool, XMLHttpRequest::Impl::Elements>
 XMLHttpRequest::Impl::proccessUri(const std::string &uri) noexcept {
+
   if (uri.empty())
     return {};
 
-  if (boost::smatch what;
-      boost::regex_search(uri, what, boost::regex{protoIpPortUrlRegex})) {
+  // Create temporary copy of uri
+  std::string tUri(uri);
+
+  // Clear spaces
+  if (tUri.find_first_of(" ")) {
+    if (auto noSpaceIt = std::remove(std::begin(tUri), std::end(tUri), ' ');
+        noSpaceIt != std::end(tUri)) {
+      tUri.erase(noSpaceIt, std::end(tUri));
+    }
+  }
+
+  if (boost::smatch what; boost::regex_search(
+          std::string{tUri}, what, boost::regex{protoIpPortUrlRegex})) {
     //'what' variable is it const refence (usage of move semantics is it
     // impossible)
     //    for (int i = 0; i < 6;)

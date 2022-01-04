@@ -22,7 +22,7 @@ Responce::Responce() : d(new Responce::Impl(), [](auto p) { delete p; }) {}
 void Responce::statusCode(const int sc) { d->statusCode_ = sc; }
 
 int Responce::statusCode() const { return d->statusCode_; }
-
+///\todo FIX  contentLength in GET
 void Responce::contentLength(const int64_t n) { d->contentLength_ = n; }
 
 int64_t Responce::contentLength() const { return d->contentLength_; }
