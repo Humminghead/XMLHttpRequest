@@ -161,6 +161,7 @@ void XMLHttpRequest::Impl::certificate_ssl(
 
 std::tuple<bool, XMLHttpRequest::Impl::Elements>
 XMLHttpRequest::Impl::proccessUri(const std::string &uri) noexcept {
+
   if (uri.empty())
     return {};
 
