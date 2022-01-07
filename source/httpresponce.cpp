@@ -43,6 +43,8 @@ void Responce::data(const uint8_t *data, const size_t len) {
   auto chunk = chunk_type{};
   chunk.reserve(len);
 
+  d->contentLength_ += len;
+
   std::copy(data, data + len, std::back_inserter(chunk));
   d->data_.push_back(std::move(chunk));
 }
