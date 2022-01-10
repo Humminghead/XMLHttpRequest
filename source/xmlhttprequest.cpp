@@ -177,12 +177,7 @@ void XMLHttpRequest::send(std::string &&body) {
 
 void XMLHttpRequest::setRequestHeader(const std::string &header,
                                       const std::string &value) {
-  std::string tHeader;
-  tHeader.reserve(header.size());
-
-  std::transform(std::begin(header), std::end(header), std::begin(tHeader),
-                 [](auto c) { return std::tolower(c); });
-  d->header.emplace(tHeader, HeaderValue{value.c_str(), value.size(), false});
+  d->header.emplace(header, HeaderValue{value.c_str(), value.size(), false});
 }
 
 void XMLHttpRequest::setRequestHeader(std::string &&header,
