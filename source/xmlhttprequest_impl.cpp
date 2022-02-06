@@ -22,7 +22,7 @@ namespace network {
 [[maybe_unused]] static constexpr std::string_view regexGroupHostPort{
     R"(([0-9a-z\.]{3,}))"};
 [[maybe_unused]] static constexpr std::string_view regexAddressOrHostPort{
-    R"(([0-9a-z\.:]{3,}))"};
+    R"(([0-9a-z\.:-]{3,}))"};
 [[maybe_unused]] static constexpr std::string_view regexDigitChains{
     R"(([0-9]+))"};
 [[maybe_unused]] static constexpr std::string_view regexGroupIpPort{
