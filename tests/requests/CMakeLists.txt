@@ -10,6 +10,7 @@ link_libraries(XMLHttpRequest stdc++)
 
 add_executable(host_avail_test ping.cpp)
 add_executable(get_request_test get_request_test.cpp)
+add_executable(post_request_test post_request_test.cpp)
 
 #--------------------------------------------------------------------
 # Tests
