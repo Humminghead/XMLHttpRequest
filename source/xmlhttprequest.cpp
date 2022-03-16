@@ -154,7 +154,10 @@ void XMLHttpRequest::send() {
   if (auto method = HttpTlsSession::methodFromString(d->method);
       method == HttpTlsSession::Method::Get) {
     sendGet();
-  } else {
+  }
+  else if(method == HttpTlsSession::Method::Post){
+    sendPost("");
+  }else {
     spdlog::info("{} Unsupported method \"{}\" in XMLHttpRequest::send() call!",
                  pthread_self(), d->method);
   }
