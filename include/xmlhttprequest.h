@@ -16,9 +16,9 @@ public:
   template <typename T = uint8_t> using ArrayBuffer = std::vector<T>;
 
   XMLHttpRequest();
-  XMLHttpRequest(std::string &&method, std::string &&url, bool async);
+  XMLHttpRequest(std::string &&method, std::string &&url, bool async = false);
   XMLHttpRequest(const std::string_view method, const std::string_view url,
-                 bool async);
+                 bool async = false);
 
   void abort();
   std::string getAllResponseHeaders();
