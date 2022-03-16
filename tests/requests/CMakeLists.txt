@@ -2,7 +2,7 @@ include(CTest)
 project(XMLHttpRequestTests)
 
 include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${LIB_INCLUDE_PATH})
-link_libraries(XMLHttpRequest)
+link_libraries(XMLHttpRequest stdc++)
 
 #--------------------------------------------------------------------
 # Executable
