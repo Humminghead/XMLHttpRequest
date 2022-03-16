@@ -81,6 +81,7 @@ install(TARGETS ${PROJECT_NAME}
 #--------------------------------------------------------------------
 # Tests
 #--------------------------------------------------------------------
+option(BUILD_TESTING "Enables unit tests" OFF)
 if(BUILD_TESTING)
     message( STATUS "\"BUILD_TESTING\" option is ON")
 
