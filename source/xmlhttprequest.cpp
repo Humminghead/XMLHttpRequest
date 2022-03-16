@@ -45,11 +45,28 @@ XMLHttpRequest::XMLHttpRequest(const std::string_view method,
     spdlog::error("{} Error while session prepare", pthread_self());
 
   if (auto ok = setup(); !ok)
-    spdlog::error("{} Error while session setup", pthread_self());
+      spdlog::error("{} Error while session setup", pthread_self());
+}
+
+XMLHttpRequest::XMLHttpRequest(XMLHttpRequest &&request):d{std::move(request.d)}{}
+
+XMLHttpRequest &XMLHttpRequest::operator()(XMLHttpRequest &&request){
+    this->d = std::move(request.d);
+    return *this;
+}
+
+XMLHttpRequest::~XMLHttpRequest()
+{
+    this->abort();
 }
 
 void XMLHttpRequest::abort() {
-  spdlog::trace("{} XMLHttpRequest::abort()", pthread_self());
+    spdlog::trace("{} XMLHttpRequest::abort()", pthread_self());
+  if (!d) {
+      spdlog::error("{} XMLHttpRequest abort failed! Request is empty!", pthread_self());
+      return ;
+  }
+
   d->service->stop();
   d->session->stop();
 }
@@ -82,6 +99,11 @@ std::string XMLHttpRequest::getResponseHeader(const std::string &header) {
 
 bool XMLHttpRequest::open() {
   spdlog::trace("{} XMLHttpRequest::open()", pthread_self());
+
+  if(!d){
+      spdlog::error("{} XMLHttpRequest open failed! Request is empty!", pthread_self());
+      return false;
+  }
 
   if (d->readyState >= ReadyState::Opened) {
     spdlog::error("{} Session alredy open!", pthread_self());
@@ -151,6 +173,11 @@ void XMLHttpRequest::overrideMimeType(std::string &&mime) {
 }
 
 void XMLHttpRequest::send() {
+  if (!d) {
+      spdlog::error("{}  XMLHttpRequest::send() failed! Request is empty!", pthread_self());
+      return ;
+  }
+
   if (auto method = HttpTlsSession::methodFromString(d->method);
       method == HttpTlsSession::Method::Get) {
     sendGet();
@@ -287,6 +314,11 @@ bool XMLHttpRequest::prepare(std::string &&method, std::string &&uri,
 
   std::transform(std::begin(method), std::end(method), std::begin(method),
                  [](unsigned char c) { return std::toupper(c); });
+
+  if(!d){
+      spdlog::error("{} XMLHttpRequest::prepare failed! Request empty!", pthread_self());
+      return false;
+  }
 
   d->isAsync = async;
 

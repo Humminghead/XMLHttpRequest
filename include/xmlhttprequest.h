@@ -19,6 +19,13 @@ public:
   XMLHttpRequest(std::string &&method, std::string &&url, bool async = false);
   XMLHttpRequest(const std::string_view method, const std::string_view url,
                  bool async = false);
+  XMLHttpRequest(XMLHttpRequest&& request);
+  XMLHttpRequest& operator()(XMLHttpRequest&& request);
+
+  XMLHttpRequest(XMLHttpRequest& request) = delete;
+  XMLHttpRequest& operator()(const XMLHttpRequest& request) = delete;
+
+  ~XMLHttpRequest();
 
   void abort();
   std::string getAllResponseHeaders();
@@ -53,9 +60,7 @@ private:
   void initCallbacks() noexcept;
   bool prepare(std::string &&method, std::string &&url, bool async);
   bool setup();
-  void setupTimer() noexcept;
-  //  bool initialize(const std::string &method, const std::string &url);
-  //  void makeJob(std::string &&method, std::string &&url);
+  void setupTimer() noexcept;  
 
   void sendGet();
   void sendPost(std::string &&body);
