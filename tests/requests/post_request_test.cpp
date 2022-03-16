@@ -13,7 +13,7 @@ int main() {
   auto method = std::string{"POST"};
   auto url = std::string{"https://httpbin.org/post"};
 
-  XMLHttpRequest req(method, url, true);
+  XMLHttpRequest req(method, url);
 
   req.setRequestHeader("accept","*/*");
   req.setRequestHeader("accept-language", "en-US,en;q=0.5");
@@ -27,7 +27,7 @@ int main() {
   req.setRequestHeader("Sec-Fetch-Mode", "cors");
   req.setRequestHeader("Sec-Fetch-Site", "cross-site");
   req.setRequestHeader("user-agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:88.0) Gecko/20100101 Firefox/88.0");
-  req.timeout(1000);
+  req.timeout(3000);
 
   req.setOnReadyCallback([&](auto&& result) {
       auto [httpRq, httpRp] = result;
@@ -36,10 +36,7 @@ int main() {
                    httpRq->host(), httpRq->method(), httpRq->scheme(), httpRp->contentLength());
 
       // Print headers
-      spdlog::info("Raw responce headers:\r\n {} ", req.getAllResponseHeaders());
-
-      // Stop
-      req.abort();
+      spdlog::info("Raw responce headers:\r\n {} ", req.getAllResponseHeaders());      
   });
 
   req.open();
