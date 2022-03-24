@@ -13,7 +13,7 @@ int main() {
   auto method = std::string{"GET"};
   auto url = std::string{"https://github.githubassets.com/images/mona-loading-dark.gif"};
 
-  XMLHttpRequest req(method, url, true);
+  XMLHttpRequest req(method, url);
 
   req.setRequestHeader("accept","image/avif,image/webp,*/*");
   req.setRequestHeader("accept-encoding", "gzip, deflate, br");
@@ -24,8 +24,8 @@ int main() {
   req.setRequestHeader("Sec-Fetch-Dest", "image");
   req.setRequestHeader("Sec-Fetch-Mode", "no-cors");
   req.setRequestHeader("Sec-Fetch-Site", "cross-site");
-  req.setRequestHeader("user-agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:88.0) Gecko/20100101 Firefox/88.0");
-  req.timeout(1000);
+  req.setRequestHeader("user-agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:88.0) Gecko/20100101 Firefox/88.0");  
+  req.timeout(3000);
   req.open();
 
   // Send with callback
