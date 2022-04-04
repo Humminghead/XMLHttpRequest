@@ -220,13 +220,7 @@ void XMLHttpRequest::openRequest(std::string method, //
                                  bool async,         //
                                  std::string user,   //
                                  std::string password) {
-  ///\todo Add realisation
-
-  (void)method;
-  (void)url;
-  (void)async;
-  (void)user;
-  (void)password;
+    open(std::move(method), std::move(url), std::move(async), std::move(user), std::move(password));
 }
 
 bool XMLHttpRequest::setOnReadyCallback(onReadyCallback &&cb) noexcept {
