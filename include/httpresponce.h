@@ -39,7 +39,7 @@ public:
   void updateHeaderBufferSize(const size_t len);
 
   const data_type &data() const;
-  void data(const uint8_t *data, const size_t len);
+  void data(const uint8_t *&data, const size_t len);
 
   const std::string text() const;
 };
