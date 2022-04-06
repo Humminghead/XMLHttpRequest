@@ -39,7 +39,7 @@ void Responce::updateHeaderBufferSize(const size_t len) {
 
 const Responce::data_type &Responce::data() const { return d->data_; }
 
-void Responce::data(const uint8_t *data, const size_t len) {
+void Responce::data(const uint8_t *&data, const size_t len) {
   auto chunk = chunk_type{};
   chunk.reserve(len);
 
