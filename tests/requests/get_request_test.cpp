@@ -32,7 +32,7 @@ int main() {
   req.send([&](auto &&result) {
     if (auto [httpRq, httpRp] = result; 200 == httpRp->statusCode()) {
       spdlog::info("{} Status code: {}", pthread_self(), httpRp->statusCode());
-      spdlog::info("{} Host: {} Method: {} Scheme: {} Responce data size: {} ",
+      spdlog::info("{} Host: {} Method: {} Scheme: {} Response data size: {} ",
                    pthread_self(), httpRq->host(), httpRq->method(),
                    httpRq->scheme(), httpRp->contentLength());
     } else {

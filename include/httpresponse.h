@@ -8,7 +8,7 @@ namespace network {
 
 class Header;
 
-class Responce {
+class Response {
 private:
   struct Impl;
   std::unique_ptr<Impl, void (*)(Impl *)> d;
@@ -17,14 +17,14 @@ public:
   using chunk_type = std::vector<uint8_t>;
   using data_type = std::vector<chunk_type>;
 
-  Responce();
-  ~Responce() = default;
+  Response();
+  ~Response() = default;
 
-  Responce(Responce &&) = default;
-  Responce &operator=(Responce &&) = default;
+  Response(Response &&) = default;
+  Response &operator=(Response &&) = default;
 
-  Responce(const Responce &) = delete;
-  Responce &operator=(const Responce &) = delete;
+  Response(const Response &) = delete;
+  Response &operator=(const Response &) = delete;
 
   void statusCode(const int sc);
   int statusCode() const;

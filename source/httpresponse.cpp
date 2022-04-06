@@ -1,4 +1,4 @@
-#include "httpresponce.h"
+#include "httpresponse.h"
 #include "httpheader.h"
 #include "httpheadervalue.h"
 
@@ -9,7 +9,7 @@
 
 namespace network {
 
-struct Responce::Impl {
+struct Response::Impl {
   size_t contentLength_{0};
   size_t headerBufferSize_{0};
   int statusCode_{-1};
@@ -17,29 +17,29 @@ struct Responce::Impl {
   data_type data_{};
 };
 
-Responce::Responce() : d(new Responce::Impl(), [](auto p) { delete p; }) {}
+Response::Response() : d(new Response::Impl(), [](auto p) { delete p; }) {}
 
-void Responce::statusCode(const int sc) { d->statusCode_ = sc; }
+void Response::statusCode(const int sc) { d->statusCode_ = sc; }
 
-int Responce::statusCode() const { return d->statusCode_; }
+int Response::statusCode() const { return d->statusCode_; }
 ///\todo FIX  contentLength in GET
-void Responce::contentLength(const int64_t n) { d->contentLength_ = n; }
+void Response::contentLength(const int64_t n) { d->contentLength_ = n; }
 
-int64_t Responce::contentLength() const { return d->contentLength_; }
+int64_t Response::contentLength() const { return d->contentLength_; }
 
-Header &Responce::header() { return d->header_; }
+Header &Response::header() { return d->header_; }
 
-const Header &Responce::header() const { return d->header_; }
+const Header &Response::header() const { return d->header_; }
 
-size_t Responce::headerBufferSize() const { return d->headerBufferSize_; }
+size_t Response::headerBufferSize() const { return d->headerBufferSize_; }
 
-void Responce::updateHeaderBufferSize(const size_t len) {
+void Response::updateHeaderBufferSize(const size_t len) {
   d->headerBufferSize_ = len;
 }
 
-const Responce::data_type &Responce::data() const { return d->data_; }
+const Response::data_type &Response::data() const { return d->data_; }
 
-void Responce::data(const uint8_t *&data, const size_t len) {
+void Response::data(const uint8_t *&data, const size_t len) {
   auto chunk = chunk_type{};
   chunk.reserve(len);
 
@@ -49,7 +49,7 @@ void Responce::data(const uint8_t *&data, const size_t len) {
   d->data_.push_back(std::move(chunk));
 }
 
-const std::string Responce::text() const {
+const std::string Response::text() const {
   auto it = std::find_if(d->header_.begin(), d->header_.end(), [](auto &pair) {
     return (pair.second.view().find("charset=") != std::string_view::npos);
   });

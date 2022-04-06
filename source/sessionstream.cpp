@@ -2,13 +2,13 @@
 
 #include "abstractsession.h"
 #include "httprequest.h"
-#include "httpresponce.h"
+#include "httpresponse.h"
 #include <nghttp2/nghttp2.h>
 
 namespace network {
 struct Stream::Impl {
   std::shared_ptr<Request> rq{nullptr};
-  std::shared_ptr<Responce> rp{nullptr};
+  std::shared_ptr<Response> rp{nullptr};
   uint32_t stream_id_{0};
   nghttp2_stream *stream_{nullptr};
   uint32_t statusCode{0};
@@ -17,7 +17,7 @@ struct Stream::Impl {
 
 Stream::Stream() : d{new Impl(), [](auto *p) { delete p; }} {
 
-  d->rp = std::make_shared<Responce>();
+  d->rp = std::make_shared<Response>();
   d->rq = std::make_shared<Request>();
 }
 
@@ -26,7 +26,7 @@ Stream::Stream(const int id, nghttp2_stream *strm)
   this->id(static_cast<decltype(Impl::stream_id_)>(id));
   this->stream(strm);
 
-  d->rp = std::make_shared<Responce>();
+  d->rp = std::make_shared<Response>();
   d->rq = std::make_shared<Request>();
 }
 
@@ -42,7 +42,7 @@ void Stream::stream(nghttp2_stream *strm) { d->stream_ = strm; }
 
 std::shared_ptr<Request> Stream::request() { return d->rq; }
 
-std::shared_ptr<Responce> Stream::response() { return d->rp; }
+std::shared_ptr<Response> Stream::response() { return d->rp; }
 
 uint32_t Stream::status() const { return d->statusCode; }
 

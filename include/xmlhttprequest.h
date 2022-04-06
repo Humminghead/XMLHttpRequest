@@ -54,7 +54,7 @@ public:
   void timeout(const size_t milliseconds) noexcept;
   size_t timeout() const;
 
-  std::shared_ptr<Responce> responce() const;
+  std::shared_ptr<Response> responce() const;
 
 private:
   void initCallbacks() noexcept;
