@@ -48,7 +48,7 @@ XMLHttpRequest req(method, url, false);
   req.setOnReadyCallback([&](auto&& result) {
       auto [httpRq, httpRp] = result;
       spdlog::info("{} Status code: {}", pthread_self(), httpRp->statusCode());
-      spdlog::info("{} Host: {} Method: {} Scheme: {} Responce data size: {} ", pthread_self(),
+      spdlog::info("{} Host: {} Method: {} Scheme: {} Response data size: {} ", pthread_self(),
                    httpRq->host(), httpRq->method(), httpRq->scheme(), httpRp->contentLength());
 
       // Print headers
@@ -172,6 +172,6 @@ size_t timeout() const
 >    Return the number of milliseconds a request can take before automatically being terminated.
 
 ```C++
-std::shared_ptr<Responce> responce() const
+std::shared_ptr<Response> responce() const
 ```
- >    If responce sucessful the response method returns the response's body content as a pointer of class class Responce, what cointains status code of request, headers, content length and data. Otherwise method return nullptr.The success of the operation depending on the value of the request's responseType property.
+ >    If responce sucessful the response method returns the response's body content as a pointer of class class Response, what cointains status code of request, headers, content length and data. Otherwise method return nullptr.The success of the operation depending on the value of the request's responseType property.

@@ -8,7 +8,7 @@ struct nghttp2_stream;
 
 namespace network {
 class Request;
-class Responce;
+class Response;
 class AbstractSession;
 
 class Stream {
@@ -38,7 +38,7 @@ public:
   void stream(nghttp2_stream *strm);
 
   std::shared_ptr<Request> request();
-  std::shared_ptr<Responce> response();
+  std::shared_ptr<Response> response();
 
   uint32_t status() const;
   void status(uint32_t code) const;

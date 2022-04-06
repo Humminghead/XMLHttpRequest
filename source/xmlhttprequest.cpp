@@ -229,7 +229,7 @@ bool XMLHttpRequest::setOnReadyCallback(onReadyCallback &&cb) noexcept {
     return false;
 
   d->session->setOnReadyCallback(
-      [=](std::pair<std::shared_ptr<Request>, std::shared_ptr<Responce>>
+      [=](std::pair<std::shared_ptr<Request>, std::shared_ptr<Response>>
               &&pair) {
         // Save responce
         d->responce = pair.second;
@@ -279,7 +279,7 @@ void XMLHttpRequest::timeout(const size_t milliseconds) noexcept {
 
 size_t XMLHttpRequest::timeout() const { return d->timeout.count(); }
 
-std::shared_ptr<Responce> XMLHttpRequest::responce() const {
+std::shared_ptr<Response> XMLHttpRequest::responce() const {
   return d->responce;
 }
 

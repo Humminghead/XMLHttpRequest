@@ -9,10 +9,10 @@
 namespace network {
 
 class Request;
-class Responce;
+class Response;
 
 // Session callbacks types
-using onReadyCallback = std::function<void(std::pair<std::shared_ptr<Request>, std::shared_ptr<Responce>> &&)>;
+using onReadyCallback = std::function<void(std::pair<std::shared_ptr<Request>, std::shared_ptr<Response>> &&)>;
 using onStopCallback = std::function<void()>;
 using onConnectCallback = std::function<void()>;
 using onStateChangeCallback = std::function<void(const uint8_t)>;

@@ -32,7 +32,7 @@ int main() {
   req.setOnReadyCallback([&](auto&& result) {
       auto [httpRq, httpRp] = result;
       spdlog::info("{} Status code: {}", pthread_self(), httpRp->statusCode());
-      spdlog::info("{} Host: {} Method: {} Scheme: {} Responce data size: {} ", pthread_self(),
+      spdlog::info("{} Host: {} Method: {} Scheme: {} Response data size: {} ", pthread_self(),
                    httpRq->host(), httpRq->method(), httpRq->scheme(), httpRp->contentLength());
 
       // Print headers
