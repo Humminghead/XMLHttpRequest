@@ -57,7 +57,7 @@ struct XMLHttpRequest::Impl {
   std::string body{};
   std::string ssl_certificate{};
   Header header{};
-  std::shared_ptr<Response> responce{nullptr};
+  std::shared_ptr<Response> response{nullptr};
 
   using future_t = std::future<std::size_t>;
   std::shared_ptr<future_t> future;

@@ -75,7 +75,7 @@ std::string XMLHttpRequest::getAllResponseHeaders() {
 
   std::string headers{""};
 
-  if (auto resp = d->responce; resp) {
+  if (auto resp = d->response; resp) {
     for (auto &header : resp->header()) {
       auto [name, data] = header;
       headers.append(name + ": " + data.value + "\r\n");
@@ -86,7 +86,7 @@ std::string XMLHttpRequest::getAllResponseHeaders() {
 }
 
 std::string XMLHttpRequest::getResponseHeader(const std::string &header) {
-  if (auto resp = d->responce; resp) {
+  if (auto resp = d->response; resp) {
     auto it = std::find_if(std::begin(resp->header()), std::end(resp->header()),
                            [&](auto &hdr) { return hdr.first == header; });
 
@@ -231,8 +231,8 @@ bool XMLHttpRequest::setOnReadyCallback(onReadyCallback &&cb) noexcept {
   d->session->setOnReadyCallback(
       [=](std::pair<std::shared_ptr<Request>, std::shared_ptr<Response>>
               &&pair) {
-        // Save responce
-        d->responce = pair.second;
+        // Save response
+        d->response = pair.second;
 
         // Invoke callback function
         if (cb)
@@ -279,8 +279,8 @@ void XMLHttpRequest::timeout(const size_t milliseconds) noexcept {
 
 size_t XMLHttpRequest::timeout() const { return d->timeout.count(); }
 
-std::shared_ptr<Response> XMLHttpRequest::responce() const {
-  return d->responce;
+std::shared_ptr<Response> XMLHttpRequest::response() const {
+  return d->response;
 }
 
 void XMLHttpRequest::initCallbacks() noexcept {
@@ -377,8 +377,8 @@ void XMLHttpRequest::sendGet() {
   if (!d->service || !d->session /*|| !d->future*/)
     return;
 
-  // Reset responce
-  d->responce.reset();
+  // Reset response
+  d->response.reset();
 
   // Put jobs into io_service
   d->service->post([&] { this->connect(); });
@@ -409,8 +409,8 @@ void XMLHttpRequest::sendPost(std::string &&body) {
   // Save boby
   d->body = std::move(body);
 
-  // Reset responce
-  d->responce.reset();
+  // Reset response
+  d->response.reset();
 
   // Put jobs into io_service
   d->service->post([&] { this->connect(); });
