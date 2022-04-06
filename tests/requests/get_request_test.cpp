@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "httprequest.h"
-#include "httpresponce.h"
+#include "httpresponse.h"
 #include "xmlhttprequest.h"
 
 int main() {
@@ -40,7 +40,7 @@ int main() {
     }
 
     // Print headers
-    spdlog::info("Raw responce headers:\r\n {} ", req.getAllResponseHeaders());
+    spdlog::info("Raw response headers:\r\n {} ", req.getAllResponseHeaders());
 
     // Stop
     req.abort();
