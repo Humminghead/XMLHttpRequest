@@ -42,6 +42,9 @@ public:
   void data(const uint8_t *&data, const size_t len);
 
   const std::string text() const;
+
+  const std::string_view type() const;
+  bool type(const std::string_view& type);
 };
 
 } // namespace network
