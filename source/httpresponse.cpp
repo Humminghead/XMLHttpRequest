@@ -67,4 +67,27 @@ const std::string Response::text() const {
 
   return {};
 }
+
+const std::string_view Response::type() const {
+  if (auto encoding = std::find_if(
+          std::begin(d->header_), std::end(d->header_),
+          [](const auto &pair) { return "content-encoding" == pair.first; });
+      encoding != std::end(d->header_)) {
+    return encoding->second.value;
+  }
+
+  return {};
+}
+
+bool Response::type(const std::string_view &type) {
+  if (auto encoding = std::find_if(
+          std::begin(d->header_), std::end(d->header_),
+          [](const auto &pair) { return "content-encoding" == pair.first; });
+      encoding != std::end(d->header_)) {
+    encoding->second.value = type;
+    return true;
+  }
+
+  return false;
+}
 } // namespace network

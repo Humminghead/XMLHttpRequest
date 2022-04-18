@@ -16,7 +16,6 @@ struct Stream::Impl {
 };
 
 Stream::Stream() : d{new Impl(), [](auto *p) { delete p; }} {
-
   d->rp = std::make_shared<Response>();
   d->rq = std::make_shared<Request>();
 }
