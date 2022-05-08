@@ -22,10 +22,15 @@ Response::Response() : d(new Response::Impl(), [](auto p) { delete p; }) {}
 void Response::statusCode(const int sc) { d->statusCode_ = sc; }
 
 int Response::statusCode() const { return d->statusCode_; }
-///\todo FIX  contentLength in GET
+
 void Response::contentLength(const int64_t n) { d->contentLength_ = n; }
 
-int64_t Response::contentLength() const { return d->contentLength_; }
+int64_t Response::contentLength() const {
+  if (d->contentLength_ == 0)
+    std::for_each(std::begin(d->data_), std::end(d->data_),
+                  [&](auto &chunk) { d->contentLength_ += chunk.size(); });
+  return d->contentLength_;
+}
 
 Header &Response::header() { return d->header_; }
 
@@ -42,8 +47,6 @@ const Response::data_type &Response::data() const { return d->data_; }
 void Response::data(const uint8_t *&data, const size_t len) {
   auto chunk = chunk_type{};
   chunk.reserve(len);
-
-  d->contentLength_ += len;
 
   std::copy(data, data + len, std::back_inserter(chunk));
   d->data_.push_back(std::move(chunk));
