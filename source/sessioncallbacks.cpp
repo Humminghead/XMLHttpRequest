@@ -318,11 +318,14 @@ int onDataChunkRecvCallback(nghttp2_session *session, uint8_t flags,
     cb(static_cast<uint8_t>(ReadyState::Loading));
 
   if (auto strm = s->findStream(stream_id); strm) {
-    auto res = strm->response();
-    spdlog::trace("{} Call res->onData(data,{}) ", pthread_self(), len);
-    res->data(data, len);
+    if (auto res = strm->response(); res) {
+      spdlog::trace("{} Call res->onData(data,{}) ", pthread_self(), len);
+      res->data(data, len);
+    } else {
+      spdlog::error("{} Response is NULL. Data was lost! Stream {}", pthread_self(), stream_id);
+    }
   } else {
-    spdlog::trace("{} Stream {} not found ", pthread_self(), stream_id);
+    spdlog::error("{} Stream {} not found ", pthread_self(), stream_id);
   }
 
   return 0;
